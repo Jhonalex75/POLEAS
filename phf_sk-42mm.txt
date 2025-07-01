@@ -1,0 +1,10 @@
+﻿"Symbol";"Value";"Unit";
+"TraceParts.PartNumber";"32-11042024-065342";"";
+"REFERENCE";"PHF SK-42MM";"";
+"TraceParts.PartTitle";"QD Bushing";"";
+"TraceParts.InstanceId";"32-11042024-065342CE8I511G48WSVGNOQ2R0JNPCI";"";
+"SUPPLIER";"SKF";"";
+"DESIGN";"QD Bushing";"";
+"TRACEPARTS";"TRACEPARTS";"";
+"TraceParts.PartLanguage";"en";"";
+"TraceParts.PartVersion";"1.0.8";"";

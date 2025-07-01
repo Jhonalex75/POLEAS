@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Transmisión para Bombas</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-container {
+            flex: 1;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .resultado {
+            flex: 1;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .section-title {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            margin: 25px 0 15px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .result-item {
+            margin: 12px 0;
+            padding: 12px;
+            background-color: #e6f3ff;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fadbd8;
+            border-radius: 5px;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .grafica {
+            max-width: 100%;
+            height: auto;
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Cálculo de Transmisión para Bombas</h1>
+    
+    <div class="container">
+        <div class="form-container">
+            <h2>Datos de Entrada</h2>
+            <form id="calcForm">
+                <div class="form-group">
+                    <label>RPM Motor:</label>
+                    <input type="number" name="rpm_motor" value="1800" min="500" max="5000" step="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>HP Motor:</label>
+                    <input type="number" name="hp_motor" value="75" step="0.1" min="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label>RPM Bomba Deseada:</label>
+                    <input type="number" name="rpm_bomba" value="1600" min="500" max="5000" step="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>Distancia entre centros (mm):</label>
+                    <input type="number" name="centro_dist" value="620" min="100" max="2000" step="10">
+                </div>
+                
+                <div class="form-group">
+                    <label>Diámetro polea motor (pulg):</label>
+                    <input type="number" name="diam_motor" value="8.95" step="0.01" min="1" max="20">
+                </div>
+                
+                <div class="form-group">
+                    <label>Canales polea motor:</label>
+                    <input type="number" name="canales_motor" value="4" min="1" max="10">
+                </div>
+                
+                <button type="submit">Calcular</button>
+            </form>
+        </div>
+        
+        <div class="resultado" style="display:none" id="resultados">
+            <h2>Resultados del Cálculo</h2>
+            <div id="datos"></div>
+            <img id="grafica" class="grafica">
+        </div>
+    </div>
+    
+    <div class="footer">
+        MiniMax AI - Solución para cálculos de transmisión por poleas en bombas
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#calcForm').submit(function(e){
+                e.preventDefault();
+                $.post('/calcular', $(this).serialize(), function(data){
+                    let html = `
+                        <div class="section-title">Características de la Transmisión</div>
+                        <div class="result-item">Diámetro polea bomba: <strong>${data.diam_bomba}"</strong></div>
+                        <div class="result-item">Canales: <strong>${data.canales_bomba}</strong></div>
+                        <div class="result-item">Tipo de correa: <strong>${data.tipo_correa}</strong></div>
+                        <div class="result-item">Longitud: <strong>${data.longitud} pulg</strong></div>
+                    `;
+                    
+                    html += '<div class="section-title">Factor de Seguridad</div>';
+                    html += `<div class="result-item">Factor de seguridad calculado: <strong>${data.factor_seguridad}</strong></div>`;
+                    html += `<div class="result-item">Factor de servicio: <strong>1.6</strong> (Bomba reciprocante)</div>`;
+                    html += `<div class="result-item">Potencia de diseño: <strong>${data.hp_diseno} HP</strong></div>`;
+                    html += `<div class="result-item">Capacidad total: <strong>${data.capacidad_total} HP</strong></div>`;
+                    
+                    if(data.factor_seguridad < 1.5) {
+                        html += '<div class="warning">¡ADVERTENCIA! El factor de seguridad (${data.factor_seguridad}) es menor que el recomendado (1.5). Considere aumentar el número de canales o usar un perfil de correa mayor.</div>';
+                    }
+                    
+                    $('#datos').html(html);
+                    $('#grafica').attr('src', data.plot_url);
+                    $('#resultados').show();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
