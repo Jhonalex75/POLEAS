@@ -1,0 +1,12 @@
+﻿"Symbol";"Value";"Unit";
+"TraceParts.PartNumber";"90-12072021-037843";"";
+"REFERENCE";"02036EG3E256T-W22";"";
+"SUPPLIER_PART_NUMBER";"07568453";"";
+"TraceParts.PartTitle";"02036EG3E256T-W22 WITH FLC-E250-W22";"";
+"Part_Number_EShop_URL";"https://motionindustries.com/products/sku/07568453";"";
+"SUPPLIER_NAME";"Motion Industries";"";
+"SUPPLIER";"WEG Electric Corporation";"";
+"DESIGN";"02036EG3E256T-W22 WITH FLC-E250-W22";"";
+"TraceParts.InstanceId";"90-12072021-03784339SXJ2KNTK58IHA5B5Z9R1Z69";"";
+"TraceParts.PartVersion";"1.0.5";"";
+"TraceParts.PartLanguage";"en";"";

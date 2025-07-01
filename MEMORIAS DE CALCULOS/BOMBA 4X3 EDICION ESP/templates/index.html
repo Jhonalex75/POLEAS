@@ -1,0 +1,87 @@
+html_template = """
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Transmisión por Polea y Correa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Calculadora de Diseño de Transmisión por Polea</h1>
+            <p class="text-gray-600 mt-2">Basado en conceptos de diseño de elementos de máquinas y datos de la bomba Warman.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Columna de Entrada de Datos -->
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h2 class="text-2xl font-semibold mb-6 text-blue-600 border-b pb-2">Datos de Entrada</h2>
+                <form action="/" method="post">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="potencia_hp" class="block text-sm font-medium text-gray-700">Potencia del Motor (HP)</label>
+                            <input type="number" step="0.1" name="potencia_hp" id="potencia_hp" value="{{ form_data.potencia_hp }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                        <div>
+                            <label for="rpm_motor" class="block text-sm font-medium text-gray-700">RPM del Motor</label>
+                            <input type="number" step="1" name="rpm_motor" id="rpm_motor" value="{{ form_data.rpm_motor }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                        <div>
+                            <label for="rpm_bomba" class="block text-sm font-medium text-gray-700">RPM deseadas de la Bomba</label>
+                            <input type="number" step="1" name="rpm_bomba" id="rpm_bomba" value="{{ form_data.rpm_bomba }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                        <div>
+                            <label for="d_motora" class="block text-sm font-medium text-gray-700">Diámetro Polea Motora (pulgadas)</label>
+                            <input type="number" step="0.01" name="d_motora" id="d_motora" value="{{ form_data.d_motora }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                         <div>
+                            <label for="C_mm" class="block text-sm font-medium text-gray-700">Distancia entre Centros (mm)</label>
+                            <input type="number" step="1" name="C_mm" id="C_mm" value="{{ form_data.C_mm }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                        </div>
+                    </div>
+                    <button type="submit" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Calcular Diseño
+                    </button>
+                </form>
+            </div>
+
+            <!-- Columna de Resultados -->
+            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h2 class="text-2xl font-semibold mb-6 text-green-600 border-b pb-2">Resultados del Diseño</h2>
+                {% if resultados %}
+                <div class="space-y-3 text-gray-700">
+                    <p><strong>Diámetro calculado de Polea de Bomba:</strong> <span class="font-mono text-lg text-green-700">{{ "%.2f"|format(resultados.d_bomba) }} pulgadas</span></p>
+                    <p><strong>Tipo de Correa:</strong> <span class="font-mono text-lg text-green-700">5V (basado en potencia)</span></p>
+                    <p><strong>Número de Canales (Correas) Requerido:</strong> <span class="font-mono text-lg text-green-700">{{ resultados.num_correas }}</span></p>
+                    <p><strong>Longitud de Correa Comercial:</strong> <span class="font-mono text-lg text-green-700">{{ resultados.longitud_correa }} pulgadas</span></p>
+                    <p><strong>Distancia entre Centros Real:</strong> <span class="font-mono text-lg text-green-700">{{ "%.2f"|format(resultados.C_real) }} pulgadas</span></p>
+                    <p><strong>Ángulo de Contacto (Polea Menor):</strong> <span class="font-mono text-lg text-green-700">{{ "%.1f"|format(resultados.angulo_contacto) }}°</span></p>
+                    <p><strong>Factor de Seguridad del Diseño:</strong> <span class="font-mono text-lg text-green-700">{{ "%.2f"|format(resultados.factor_seguridad) }}</span></p>
+                </div>
+                {% else %}
+                <p class="text-gray-500 italic">Los resultados aparecerán aquí después de realizar el cálculo.</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Sección de Gráfico -->
+        {% if plot_url %}
+        <div class="mt-8 bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h2 class="text-2xl font-semibold mb-4 text-purple-600 text-center">Gráfico de Curvas de la Bomba</h2>
+            <div class="flex justify-center">
+                <img src="data:image/png;base64,{{ plot_url }}" alt="Gráfico de las curvas de la bomba">
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

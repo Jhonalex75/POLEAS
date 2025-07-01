@@ -1,0 +1,13 @@
+﻿"Symbol";"Value";"Unit";
+"TraceParts.PartNumber";"90-12072021-037843";"";
+"REFERENCE";"07518AT3ECT365T-W22";"";
+"SUPPLIER_PART_NUMBER";"07431536";"";
+"TraceParts.PartTitle";"Weg Electric";"";
+"Part_Number_EShop_URL";"https://motionindustries.com/products/sku/07431536";"";
+"SUPPLIER_NAME";"Motion Industries";"";
+"SUPPLIER";"WEG Electric Corporation";"";
+"DESIGN";"07518AT3ECT365T-W22 75HP 1800 3 60 230/4";"";
+"TraceParts.InstanceId";"90-12072021-0378434LFYJ0VXXH0C86D3H28A9T89P";"";
+"TRACEPARTS";"TRACEPARTS";"";
+"TraceParts.PartLanguage";"en";"";
+"TraceParts.PartVersion";"1.0.5";"";
