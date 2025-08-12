@@ -1,129 +1,91 @@
-<<<<<<< HEAD
-# POLEAS – Calculadora de Diseño de Transmisión por Polea y Correa
+# POLEAS — Diseño y cálculo de sistemas de poleas
 
-Aplicación web desarrollada en Python y Flask para el cálculo y visualización del diseño de transmisiones por polea y correa en sistemas de bombeo industrial. Utiliza fórmulas del libro “Diseño de Elementos de Máquinas” de Mott y datos reales de bombas Warman.
+## Objetivo
+Proveer una base sólida para dimensionar y analizar sistemas de poleas (levante) con enfoque didáctico: ventaja mecánica, tensiones, eficiencia, selección de cuerda/cable y verificación de seguridad.
 
-## Características
+## Alcance
+- Sistemas ideales y reales (con pérdidas por fricción y flexión).
+- Configuraciones 1:1, 2:1, 3:1, n:1 con poleas móviles y fijas.
+- Estimación de fuerza de tracción, tensiones y factores de seguridad.
 
-- Cálculo automático de:
-  - Diámetro de poleas (motora y conducida)
-  - Longitud comercial de correa
-  - Número de correas necesarias
-  - Factor de seguridad del sistema
-- Visualización gráfica de curvas de rendimiento de la bomba y resistencia del sistema
-- Interfaz web moderna y responsiva (Tailwind CSS)
-- Basado en datos y fórmulas de ingeniería reales
+## Teoría esencial
+- **Ventaja mecánica (VM)**: número de tramos de cuerda que soportan la carga.
+  - Ideal: \( VM = n_{tramos}\)
+- **Fuerza de tracción** requerida:
+  - Ideal: \( F = \dfrac{W}{VM} \)
+  - Real con eficiencia \(\eta\): \( F = \dfrac{W}{VM\,\eta} \), \(0<\eta\le1\)
+- **Tensión en la cuerda** (tramo de entrada, ideal): \( T \approx F \)
+- **Eficiencia global**: producto de eficiencias por polea y fricción de cuerda.
+  - Aproximación: \( \eta = \eta_{polea}^{n_{poleas}} \cdot \eta_{cuerda} \)
+- **Diámetro mínimo de polea**: \( D_{min} = k\,d_{cuerda} \). Recomendado: \(k\in[15,25]\) según material.
+- **Factor de seguridad (SF)**:
+  - \( SF = \dfrac{T_{adm}}{T_{max}} \), objetivo típico: 5–8 para izaje manual básico (adaptar a norma).
 
-## Estructura del Proyecto
+## Entradas
+- `W` carga [N]
+- `VM` ventaja mecánica [–]
+- `eta` eficiencia global [0–1]
+- `d_cuerda` diámetro de cuerda/cable [m]
+- `k` relación D/d recomendada [–]
+- `SF_obj` factor de seguridad objetivo [–]
 
+## Salidas
+- `F` fuerza de tracción requerida [N]
+- `T_max` tensión máxima estimada [N]
+- `D_min` diámetro de polea recomendado [m]
+- `cumple_SF` verificación contra `SF_obj`
+
+## Procedimiento de cálculo
+1) Estima VM por configuración (cuenta tramos portantes).
+2) Estima eficiencia \(\eta\) con catálogo o ensayo.
+3) Calcula \(F = W/(VM\,\eta)\).
+4) Asume \(T_{max}\approx F\) (ideal). Para análisis detallado, distribuye tensiones por tramos con pérdidas.
+5) Selecciona \(D_{min}=k\,d_{cuerda}\). Ajusta por fabricante.
+6) Verifica \(SF = T_{adm}/T_{max}\ge SF_{obj}\).
+
+## Ejemplo numérico
+- Datos: `W=2000 N`, `VM=3`, `eta=0.85`, `d_cuerda=8e-3 m`, `k=20`, `SF_obj=6`.
+- Cálculos:  
+  \(F = 2000/(3\cdot0.85)=784.31\,N\)  
+  \(T_{max}\approx 784.31\,N\)  
+  \(D_{min}=20\cdot0.008=0.16\,m\)
+- Si `T_adm` de la cuerda ≥ \( SF_{obj}\cdot T_{max} = 6\cdot784.31=4706\,N \), entonces cumple.
+
+## Uso (rápido) con Python
+```bash
+# entorno
+python -m venv .venv && .\.venv\Scripts\activate
+pip install numpy
 ```
-POLEAS/
-│
-├── app/           # Código fuente de la aplicación Flask (app.py)
-├── cad/           # Archivos CAD y modelos 3D (.ipt, .iam, .stp, .step, .sat, etc.)
-├── calculos/      # Memorias de cálculo y resultados (archivos de texto, hojas de cálculo, etc.)
-├── docs/          # Documentación y manuales (PDFs, catálogos)
-├── images/        # Imágenes y gráficos (.jpg, .png, etc.)
-├── README.md      # Este archivo
-└── .gitignore     # (opcional)
+```python
+import numpy as np
+
+W = 2000.0
+VM = 3
+eta = 0.85
+d_cuerda = 8e-3
+k = 20
+SF_obj = 6
+
+F = W/(VM*eta)
+T_max = F
+D_min = k*d_cuerda
+
+print({"F_N":F, "T_max_N":T_max, "D_min_m":D_min})
 ```
 
-## Instalación y Ejecución
+## Validación
+- Revisa catálogo de fabricante (tensión admisible, radios mínimos, eficiencia de rodamientos).
+- Aplica normativa local si corresponde (izaje/seguridad).
 
-1. **Clona este repositorio:**
-	```bash
-	git clone https://github.com/Jhonalex75/POLEAS.git
-	cd POLEAS
-	```
+## Pruebas sugeridas (CI)
+- Casos límite: `eta∈{1,0.7}`, `VM∈{1,2,3}`, `W=0`.
+- Verificación de monotonicidad: si sube `VM`, baja `F`.
 
-2. **Instala las dependencias:**
-	```bash
-	pip install Flask matplotlib numpy
-	```
+## Roadmap
+- Distribución de tensiones por tramo con fricción por polea.
+- Selección automática de cuerda por SF y masa lineal.
+- Visualización de configuraciones (diagramas ASCII/Plotly).
 
-3. **Ejecuta la aplicación:**
-	```bash
-	python app/app.py
-	```
-
-4. **Abre tu navegador en:**
-	```
-	http://127.0.0.1:5000
-	```
-
-## Uso
-
-- Ingresa los datos del motor, bomba y geometría en el formulario web.
-- Obtén los resultados de diseño y el gráfico de curvas de la bomba.
-- Consulta la documentación técnica y los archivos CAD en las carpetas correspondientes.
-
-## Créditos y Referencias
-
-- Basado en el libro “Diseño de Elementos de Máquinas” de Mott.
-- Datos de bomba: Catálogo Warman WPA43A03.
-- Interfaz: Tailwind CSS.
-=======
-# POLEAS
-Calculo de poleas para bomba Warman 4x3
-
-    1 # POLEAS: Recursos de Ingeniería Mecánica
-    2
-    3 Este repositorio contiene una colección de recursos relacionados con la ingeniería mecánica,
-      incluyendo modelos CAD, cálculos de diseño y una aplicación web interactiva.
-    4
-    5 ## Estructura del Repositorio
-    6
-    7 El repositorio está organizado de la siguiente manera para facilitar la navegación y el acceso a
-      los diferentes tipos de recursos:
-    8
-    9 *   **`CAD_Files/`**: Contiene todos los modelos y archivos relacionados con el diseño asistido
-      por computadora (CAD).
-   10     *   **`Assemblies/`**: Ensamblajes de modelos CAD (ej. `.iam`).
-   11     *   **`Parts/`**: Componentes individuales de modelos CAD (ej. `.ipt`, `.txt` de
-      configuración).
-   12     *   **`Libraries/`**: Archivos de librerías o formatos de intercambio CAD (ej. `.SAT`).
-   13
-   14 *   **`Web_App_Calculations/`**: Contiene aplicaciones web interactivas para cálculos de
-      ingeniería.
-   15     *   **`calculations.py`**: Módulo con la lógica de cálculo central, utilizada por ambas
-      aplicaciones web.
-   16     *   **`app.py`**: La aplicación web original basada en Flask, con la interfaz de usuario (
-      `index.html`).
-   17     *   **`index.html`**: La interfaz de usuario de la aplicación web Flask.
-   18     *   **`Web_App_Introduction.ipynb`**: Un Jupyter Notebook que explica el propósito de la
-      aplicación web Flask y cómo ejecutarla.
-   19     *   **`flet_app.py`**: Una nueva aplicación web interactiva desarrollada con Flet,
-      ofreciendo una experiencia de usuario mejorada.
-   20     *   **`Flet_App_Introduction.ipynb`**: Un Jupyter Notebook que explica el propósito de la
-      aplicación web Flet y cómo ejecutarla.
-   21
-   22 *   **`docs/`**: Documentación relevante, manuales y catálogos en formato PDF.
-   23
-   24 *   **`README.md`**: Este archivo, que proporciona una visión general del repositorio.
-   25
-   26 ## Archivos CAD
-   27
-   28 Los archivos CAD incluidos en este repositorio son modelos de poleas y componentes relacionados.
-      Estos modelos pueden ser utilizados para referencia, estudio o como base para nuevos diseños.
-   29
-   30 
-   32 ## Aplicación Web de Cálculos de Ingeniería
-   33
-   34 La aplicación web en `Web_App_Calculations/` es una herramienta interactiva que realiza cálculos
-      relacionados con el diseño de transmisiones por correa en V y el análisis de curvas de bombas.
-      Para aprender cómo ejecutarla y utilizarla, consulta el notebook `Web_App_Introduction.ipynb`
-      dentro de esa carpeta.
-   35
-   36 ## Documentación
-   37
-   38 La carpeta `docs/` contiene manuales y catálogos que complementan los modelos CAD y los cálculos
-      de ingeniería. Por ejemplo:
-   39
-   40 *   `Manual_poleas_en_V_Intermec.pdf`
-   41 *   `qd-bushings-catalog.pdf`
-   42
-   43 ## Contribuciones
-   44
-   45 Las contribuciones a este repositorio son bienvenidas. Si deseas añadir nuevos modelos, cálculos
-      o mejoras, por favor, abre un "Issue" o envía un "Pull Request".
->>>>>>> 2d1b2cf02961995b1c5a01ea8e2ef04fee7b6650
+## Licencia
+MIT (o la del repositorio donde se utilice).
